@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app/model/data_model.dart';
-import 'package:firebase_app/pages/data_insert_page.dart';
 import 'package:flutter/material.dart';
 
 class DatabaseHelper{
@@ -12,7 +11,8 @@ class DatabaseHelper{
         'phone': phone,
         'name': name,
         'email': email,
-        'address': address
+        'address': address,
+        'profileImage': ''
       });
       return true;
     }catch(error){
@@ -29,7 +29,8 @@ class DatabaseHelper{
               phone: element.doc['phone'],
               name: element.doc['name'],
               email: element.doc['email'],
-              address: element.doc['address']
+              address: element.doc['address'],
+              profileImage: element.doc['profileImage']
           );
           dataList.add(dataModel);
         });
@@ -37,6 +38,27 @@ class DatabaseHelper{
       return dataList;
     }catch(error){
       return [];
+    }
+  }
+  
+  Future<bool> deleteData(String phone, BuildContext context)async{
+    try{
+      await FirebaseFirestore.instance.collection('User').doc(phone).delete();
+      return true;
+    }catch(error){
+      showSnackBar(error.toString(), context);
+      return false;
+    }
+  }
+
+  Future<bool> updateData(Map<String, String> mapData, BuildContext context)async{
+    try{
+      await FirebaseFirestore.instance.
+      collection('User').doc(mapData['phone']).update(mapData);
+      return true;
+    }catch(error){
+      showSnackBar(error.toString(), context);
+      return false;
     }
   }
 
@@ -51,4 +73,16 @@ class DatabaseHelper{
             ))
     );
   }
+
 }
+
+
+//
+// Future<void> _getImageFromGallery()async{
+//   final picker = ImagePicker();
+//   final pickedFile = await picker.getImage(source: ImageSource.gallery,maxWidth: 300,maxHeight: 300);
+//   if(pickedFile!=null){
+//     final File _image = File(pickedFile.path);
+//   }else {}
+//
+// }
